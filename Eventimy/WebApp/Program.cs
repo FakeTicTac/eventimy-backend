@@ -1,19 +1,26 @@
+using App.BLL;
 using App.DAL.EF;
-using App.Contracts.DAL;
-using System.Globalization;
-using System.IdentityModel.Tokens.Jwt;
 using System.Text;
-using App.DAL.DTO.Identity;
-using Microsoft.Identity.Web;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+using WebApp.Helpers;
+using App.Contracts.DAL;
+using App.Contracts.BLL;
+using Base.WebApp.Helpers;
+using App.Domain.Identity;
+using System.Globalization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using Base.WebApp.Helpers.Translation;
+using Microsoft.AspNetCore.Localization;
+using Swashbuckle.AspNetCore.SwaggerGen;
+using Microsoft.AspNetCore.Mvc.ApiExplorer;
 
 
 var builder = WebApplication.CreateBuilder(args);
-var dbConnectionString = builder.Configuration.GetConnectionString("AppDbContextConnection");;
+var dbConnectionString = builder.Configuration.GetConnectionString("NpgsqlConnection");
 
 var defaultCulture = builder.Configuration["DefaultCulture"];
 var supportedCultures = builder.Configuration
@@ -22,16 +29,20 @@ var supportedCultures = builder.Configuration
     .Select(x => new CultureInfo(x.Value!))
     .ToArray();
 
+
 // Adding Needed Services to Container.
+
+
 builder.Services.AddDbContext<AppDbContext>(options => options.UseNpgsql(dbConnectionString));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddScoped<IAppUnitOfWork, AppUnitOfWork>();
+builder.Services.AddScoped<IAppBusinessLogic, AppBusinessLogic>();
 
 builder.Services.AddIdentity<AppUser, AppRole>(options => { options.SignIn.RequireConfirmedAccount = false; })
-    .AddDefaultUI()
-    .AddEntityFrameworkStores<AppDbContext>()
-    .AddDefaultTokenProviders();
+        .AddDefaultUI()
+        .AddEntityFrameworkStores<AppDbContext>()
+        .AddDefaultTokenProviders();
 
 // JWT Support 
 JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
@@ -46,12 +57,10 @@ builder.Services
         {
             ValidIssuer = builder.Configuration["Jwt:Issuer"],
             ValidAudience = builder.Configuration["Jwt:Issuer"],
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"])),
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!)),
             ClockSkew = TimeSpan.Zero
         };
     });
-
-builder.Services.AddSingleton<IConfigureOptions<MvcOptions>, ConfigureModelBindingLocalization>();
 
 builder.Services.AddControllersWithViews(
     options =>
@@ -59,6 +68,7 @@ builder.Services.AddControllersWithViews(
         options.ModelBinderProviders.Insert(1, new CustomFloatingPointBinderProvider());
     }
 );
+
 
 builder.Services.Configure<IdentityOptions>(options =>
 {
@@ -131,8 +141,8 @@ builder.Services.Configure<RequestLocalizationOptions>(options =>
     options.SupportedUICultures = supportedCultures;
         
     // If Nothing is Found Use Default Culture.
-    options.DefaultRequestCulture = new RequestCulture(defaultCulture, defaultCulture);
-    options.SetDefaultCulture(defaultCulture);
+    options.DefaultRequestCulture = new RequestCulture(defaultCulture!, defaultCulture!);
+    options.SetDefaultCulture(defaultCulture!);
         
     options.RequestCultureProviders = new List<IRequestCultureProvider>
     {
@@ -198,3 +208,10 @@ app.MapControllerRoute(
 app.MapRazorPages();
 
 app.Run();
+
+
+/// <summary>
+/// Definition For Testing Purposes.
+/// </summary>
+// ReSharper disable once ClassNeverInstantiated.Global
+public partial class Program { }
