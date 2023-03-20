@@ -92,7 +92,7 @@ public class AccountController : ControllerBase
     public async Task<ActionResult<Jwt>> LogIn([FromBody] Login login)
     {
         // Verify Username 
-        var user = await _userManager.FindByEmailAsync(login.Email);
+        var user = await _userManager.FindByEmailAsync(login.Email!);
 
         if (user == null)
         {
@@ -103,7 +103,7 @@ public class AccountController : ControllerBase
 
         
         // Verify Username And Password
-        var result = await _signInManager.CheckPasswordSignInAsync(user, login.Password, false);
+        var result = await _signInManager.CheckPasswordSignInAsync(user, login.Password!, false);
 
         if (!result.Succeeded)
         {
@@ -115,7 +115,7 @@ public class AccountController : ControllerBase
         // Get Claims Based User
         var claimsPrincipal = await _signInManager.CreateUserPrincipalAsync(user);
 
-        if (claimsPrincipal == null)
+        if (claimsPrincipal == null!)
         {
             _logger.LogWarning("WebApi, Cannot Get Claims Principal for User {}", login.Email);
             await Task.Delay(_rnd.Next(100, 1000));
@@ -154,9 +154,9 @@ public class AccountController : ControllerBase
         // Generate JWT
         var jwt = IdentityExtensions.GenerateJwt(
             claimsPrincipal.Claims,
-            _configuration["JWT:Key"],
-            _configuration["JWT:issuer"],
-            _configuration["JWT:issuer"],
+            _configuration["JWT:Key"]!,
+            _configuration["JWT:issuer"]!,
+            _configuration["JWT:issuer"]!,
             DateTime.Now.AddMinutes(_configuration.GetValue<int>("JWT:ExpireInMinutes")));
 
         
@@ -193,7 +193,7 @@ public class AccountController : ControllerBase
     public async Task<ActionResult<Jwt>> Register([FromBody] Register register)
     {
         // Verify User
-        var user = await _userManager.FindByEmailAsync(register.Email);
+        var user = await _userManager.FindByEmailAsync(register.Email!);
 
         if (user != null)
         {
@@ -220,14 +220,14 @@ public class AccountController : ControllerBase
             UserName = register.UserName,
         };
 
-        var result = await _userManager.CreateAsync(user, register.Password);
+        var result = await _userManager.CreateAsync(user, register.Password!);
         
         // Operation Failed?
         if (!result.Succeeded) return BadRequest(result);
   
         
         // Get Full User
-        user = await _userManager.FindByEmailAsync(user.Email);
+        user = await _userManager.FindByEmailAsync(user.Email!);
 
         if (user == null)
         {
@@ -250,7 +250,7 @@ public class AccountController : ControllerBase
         // Get Claims Based User
         var claimsPrincipal = await _signInManager.CreateUserPrincipalAsync(user);
 
-        if (claimsPrincipal == null)
+        if (claimsPrincipal == null!)
         {
             _logger.LogWarning("WebApi, Cannot Get Claims Principal for User {}", register.Email);
             await Task.Delay(_rnd.Next(100, 1000));
@@ -261,9 +261,9 @@ public class AccountController : ControllerBase
         // Generate JWT
         var jwt = IdentityExtensions.GenerateJwt(
             claimsPrincipal.Claims,
-            _configuration["JWT:Key"],
-            _configuration["JWT:issuer"],
-            _configuration["JWT:issuer"],
+            _configuration["JWT:Key"]!,
+            _configuration["JWT:issuer"]!,
+            _configuration["JWT:issuer"]!,
             DateTime.Now.AddMinutes(_configuration.GetValue<int>("JWT:ExpireInMinutes")));
 
         
@@ -346,7 +346,7 @@ public class AccountController : ControllerBase
         // Get Claims based user
         var claimsPrincipal = await _signInManager.CreateUserPrincipalAsync(user);
 
-        if (claimsPrincipal == null)
+        if (claimsPrincipal == null!)
         {
             _logger.LogWarning("WebApi, Cannot Get Claims Principal for User {}", userEmail);
             await Task.Delay(_rnd.Next(100, 1000));
@@ -356,9 +356,9 @@ public class AccountController : ControllerBase
         // Generate JWT
         var jwt = IdentityExtensions.GenerateJwt(
             claimsPrincipal.Claims,
-            _configuration["JWT:Key"],
-            _configuration["JWT:issuer"],
-            _configuration["JWT:issuer"],
+            _configuration["JWT:Key"]!,
+            _configuration["JWT:issuer"]!,
+            _configuration["JWT:issuer"]!,
             DateTime.Now.AddMinutes(_configuration.GetValue<int>("JWT:ExpireInMinutes")));
 
 

@@ -1,124 +1,154 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
+using Api.DTO.v1;
+using AutoMapper;
+using App.Contracts.BLL;
+using Api.DTO.v1.Mappers;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using App.DAL.EF;
-using App.Domain;
 
-namespace WebApp.ApiControllers
+
+namespace WebApp.ApiControllers;
+
+
+/// <summary>
+/// API Controller For Chat Data Transfer.
+/// </summary>
+[ApiController]
+[ApiVersion("1.0")]
+[Route("api/v{version:apiVersion}/[controller]")]
+[ProducesResponseType(StatusCodes.Status400BadRequest)]
+[ProducesResponseType(StatusCodes.Status401Unauthorized)]
+[ProducesResponseType(StatusCodes.Status403Forbidden)]
+public class ChatController : ControllerBase 
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class ChatController : ControllerBase
+    /// <summary>
+    /// Business Logic Layer Connection Definition.
+    /// </summary>
+    private readonly IAppBusinessLogic _bll;
+
+    /// <summary>
+    /// Chat Mapper Connection Definition.
+    /// </summary>
+    private readonly ChatMapper _mapper;
+
+    
+    /// <summary>
+    /// Basic API Constructor Defines Business Logic Layer Connection.
+    /// </summary>
+    /// <param name="bll">Defines Business Logic Layer</param>
+    /// <param name="mapper">Mapper Connection Definition.</param>
+    public ChatController(IAppBusinessLogic bll, IMapper mapper)
     {
-        private readonly AppDbContext _context;
+        _bll = bll;
+        _mapper = new ChatMapper(mapper);
+    }
 
-        public ChatController(AppDbContext context)
+
+    /// <summary>
+    /// Method Gets All Chats.
+    /// </summary>
+    /// <returns>IEnumerable of Chats.</returns>
+    [HttpGet]
+    [Produces("application/json")]
+    [ProducesResponseType(typeof(IEnumerable<Chat>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<IEnumerable<Chat>>> GetChats() =>
+        Ok((await _bll.Chats.GetAllAsync()).Select(x => _mapper.Map(x)));
+    
+    
+    /// <summary>
+    /// Method Gets Chat.
+    /// </summary>
+    /// <param name="id">Chat ID Value To Search For Chat.</param>
+    /// <returns>Chat Object.</returns>
+    [HttpGet("{id:guid}")]
+    [Produces("application/json")]
+    [ProducesResponseType(typeof(Chat), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<Chat>> GetChat(Guid id)
+    {
+        var chat = await _bll.Chats.FirstOrDefaultAsync(id);
+
+        // Check If Exist In Database.
+        if (chat == null) return NotFound();
+        
+        return _mapper.Map(chat)!;
+    }
+    
+    
+    /// <summary>
+    /// Method Updates Record of Chat In Database Layer.
+    /// </summary>
+    /// <param name="id">Chat ID Value of Chat To Be Updated.</param>
+    /// <param name="chat">Defines Chat Value To Be Updated.</param>
+    /// <returns>
+    /// Status Codes:<br/>
+    /// 204 No Content: Update Action Was Successful.<br/>
+    /// 400 Bad Request: ID In URL And ID in DTO Doesn't Match.<br/>
+    /// </returns>
+    [HttpPut("{id:guid}")]
+    [Consumes("application/json")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    public async Task<IActionResult> PutChat(Guid id, Chat chat)
+    {
+        if (!id.Equals(chat.Id))  return BadRequest();
+        
+        // Update State In Database.
+        _bll.Chats.Update(_mapper.Map(chat)!);
+        await _bll.SaveChangesAsync();
+        
+        return NoContent();
+    }
+
+    /// <summary>
+    /// Method Creates Chat Record In Database Layer.
+    /// </summary>
+    /// <param name="chat">Object Value To Be Created In Database.</param>
+    /// <returns>Created Chat Object.</returns>
+    [HttpPost]
+    [Produces("application/json")]
+    [Consumes("application/json")]
+    [ProducesResponseType(typeof(Chat), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    public async Task<ActionResult<Chat>> PostChat(Chat chat)
+    {
+        if (HttpContext.GetRequestedApiVersion() == null) return BadRequest("API version is not defined.");
+        
+        // Add Amount Unit To The Database Layer.
+        var bllChat = _bll.Chats.Add(_mapper.Map(chat)!);
+        await _bll.SaveChangesAsync();
+
+        return CreatedAtAction("GetChat", new
         {
-            _context = context;
-        }
+            id = bllChat.Id,
+            version = HttpContext.GetRequestedApiVersion()!.ToString()
+        }, bllChat);
 
-        // GET: api/Chat
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<Chat>>> GetChats()
-        {
-          if (_context.Chats == null)
-          {
-              return NotFound();
-          }
-            return await _context.Chats.ToListAsync();
-        }
+    }
 
-        // GET: api/Chat/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Chat>> GetChat(Guid id)
-        {
-          if (_context.Chats == null)
-          {
-              return NotFound();
-          }
-            var chat = await _context.Chats.FindAsync(id);
+    /// <summary>
+    /// Method Deletes Chat In The Database Layer.
+    /// </summary>
+    /// <param name="id">Chat ID Value of Chat To Be Deleted.</param>
+    /// <returns>
+    /// Status codes:<br/>
+    /// 204 No Content: Delete Action Was Successful<br/>
+    /// 404 Not Found: Server Fails To Find Drink Type<br/>
+    /// </returns>
+    [HttpDelete("{id:guid}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> DeleteChat(Guid id)
+    {
+        // Try To Get Record From Database.
+        var chat = await _bll.Chats.FirstOrDefaultAsync(id);
 
-            if (chat == null)
-            {
-                return NotFound();
-            }
+        if (chat == null) return NotFound();
+        
+        // Remove Existed Record.
+        _bll.Chats.Remove(chat);
+        await _bll.SaveChangesAsync();
 
-            return chat;
-        }
-
-        // PUT: api/Chat/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutChat(Guid id, Chat chat)
-        {
-            if (id != chat.Id)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(chat).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!ChatExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
-        }
-
-        // POST: api/Chat
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
-        public async Task<ActionResult<Chat>> PostChat(Chat chat)
-        {
-          if (_context.Chats == null)
-          {
-              return Problem("Entity set 'AppDbContext.Chats'  is null.");
-          }
-            _context.Chats.Add(chat);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetChat", new { id = chat.Id }, chat);
-        }
-
-        // DELETE: api/Chat/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteChat(Guid id)
-        {
-            if (_context.Chats == null)
-            {
-                return NotFound();
-            }
-            var chat = await _context.Chats.FindAsync(id);
-            if (chat == null)
-            {
-                return NotFound();
-            }
-
-            _context.Chats.Remove(chat);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
-        }
-
-        private bool ChatExists(Guid id)
-        {
-            return (_context.Chats?.Any(e => e.Id == id)).GetValueOrDefault();
-        }
+        return NoContent();
     }
 }

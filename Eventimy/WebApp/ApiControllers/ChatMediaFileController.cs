@@ -1,124 +1,154 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
+using Api.DTO.v1;
+using AutoMapper;
+using App.Contracts.BLL;
+using Api.DTO.v1.Mappers;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using App.DAL.EF;
-using App.Domain;
 
-namespace WebApp.ApiControllers
+
+namespace WebApp.ApiControllers;
+
+
+/// <summary>
+/// API Controller For Chat Media File Transfer.
+/// </summary>
+[ApiController]
+[ApiVersion("1.0")]
+[Route("api/v{version:apiVersion}/[controller]")]
+[ProducesResponseType(StatusCodes.Status400BadRequest)]
+[ProducesResponseType(StatusCodes.Status401Unauthorized)]
+[ProducesResponseType(StatusCodes.Status403Forbidden)]
+public class ChatMediaFileController : ControllerBase 
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class ChatMediaFileController : ControllerBase
+    /// <summary>
+    /// Business Logic Layer Connection Definition.
+    /// </summary>
+    private readonly IAppBusinessLogic _bll;
+
+    /// <summary>
+    /// Chat Media File Mapper Connection Definition.
+    /// </summary>
+    private readonly ChatMediaFileMapper _mapper;
+
+    
+    /// <summary>
+    /// Basic API Constructor Defines Business Logic Layer Connection.
+    /// </summary>
+    /// <param name="bll">Defines Business Logic Layer</param>
+    /// <param name="mapper">Mapper Connection Definition.</param>
+    public ChatMediaFileController(IAppBusinessLogic bll, IMapper mapper)
     {
-        private readonly AppDbContext _context;
+        _bll = bll;
+        _mapper = new ChatMediaFileMapper(mapper);
+    }
 
-        public ChatMediaFileController(AppDbContext context)
+
+    /// <summary>
+    /// Method Gets All Chat Media Files.
+    /// </summary>
+    /// <returns>IEnumerable of Chat Media Files.</returns>
+    [HttpGet]
+    [Produces("application/json")]
+    [ProducesResponseType(typeof(IEnumerable<ChatMediaFile>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<IEnumerable<ChatMediaFile>>> GetChatMediaFiles() =>
+        Ok((await _bll.ChatMediaFiles.GetAllAsync()).Select(x => _mapper.Map(x)));
+    
+    
+    /// <summary>
+    /// Method Gets Chat Media File.
+    /// </summary>
+    /// <param name="id">Chat Media File ID Value To Search For Chat Media File.</param>
+    /// <returns>Chat Media File Object.</returns>
+    [HttpGet("{id:guid}")]
+    [Produces("application/json")]
+    [ProducesResponseType(typeof(ChatMediaFile), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<ChatMediaFile>> GetChatMediaFile(Guid id)
+    {
+        var chatMediaFile = await _bll.ChatMediaFiles.FirstOrDefaultAsync(id);
+
+        // Check If Exist In Database.
+        if (chatMediaFile == null) return NotFound();
+        
+        return _mapper.Map(chatMediaFile)!;
+    }
+    
+    
+    /// <summary>
+    /// Method Updates Record of Chat Media File In Database Layer.
+    /// </summary>
+    /// <param name="id">Chat Media File ID Value of Chat Media File To Be Updated.</param>
+    /// <param name="chatMediaFile">Defines Chat Media File Value To Be Updated.</param>
+    /// <returns>
+    /// Status Codes:<br/>
+    /// 204 No Content: Update Action Was Successful.<br/>
+    /// 400 Bad Request: ID In URL And ID in DTO Doesn't Match.<br/>
+    /// </returns>
+    [HttpPut("{id:guid}")]
+    [Consumes("application/json")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    public async Task<IActionResult> PutChatMediaFile(Guid id, ChatMediaFile chatMediaFile)
+    {
+        if (!id.Equals(chatMediaFile.Id))  return BadRequest();
+        
+        // Update State In Database.
+        _bll.ChatMediaFiles.Update(_mapper.Map(chatMediaFile)!);
+        await _bll.SaveChangesAsync();
+        
+        return NoContent();
+    }
+
+    /// <summary>
+    /// Method Creates Chat Media File Record In Database Layer.
+    /// </summary>
+    /// <param name="chatMediaFile">Object Value To Be Created In Database.</param>
+    /// <returns>Created Chat Media File Object.</returns>
+    [HttpPost]
+    [Produces("application/json")]
+    [Consumes("application/json")]
+    [ProducesResponseType(typeof(Chat), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    public async Task<ActionResult<ChatMediaFile>> PostChatMediaFile(ChatMediaFile chatMediaFile)
+    {
+        if (HttpContext.GetRequestedApiVersion() == null) return BadRequest("API version is not defined.");
+        
+        // Add Amount Unit To The Database Layer.
+        var bllChatMediaFile = _bll.ChatMediaFiles.Add(_mapper.Map(chatMediaFile)!);
+        await _bll.SaveChangesAsync();
+
+        return CreatedAtAction("GetChatMediaFiles", new
         {
-            _context = context;
-        }
+            id = bllChatMediaFile.Id,
+            version = HttpContext.GetRequestedApiVersion()!.ToString()
+        }, bllChatMediaFile);
 
-        // GET: api/ChatMediaFile
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<ChatMediaFile>>> GetChatMediaFiles()
-        {
-          if (_context.ChatMediaFiles == null)
-          {
-              return NotFound();
-          }
-            return await _context.ChatMediaFiles.ToListAsync();
-        }
+    }
 
-        // GET: api/ChatMediaFile/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<ChatMediaFile>> GetChatMediaFile(Guid id)
-        {
-          if (_context.ChatMediaFiles == null)
-          {
-              return NotFound();
-          }
-            var chatMediaFile = await _context.ChatMediaFiles.FindAsync(id);
+    /// <summary>
+    /// Method Deletes Chat Media File In The Database Layer.
+    /// </summary>
+    /// <param name="id">Chat Media File ID Value of Chat Media File To Be Deleted.</param>
+    /// <returns>
+    /// Status codes:<br/>
+    /// 204 No Content: Delete Action Was Successful<br/>
+    /// 404 Not Found: Server Fails To Find Drink Type<br/>
+    /// </returns>
+    [HttpDelete("{id:guid}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> DeleteChatMediaFile(Guid id)
+    {
+        // Try To Get Record From Database.
+        var chatMediaFile = await _bll.ChatMediaFiles.FirstOrDefaultAsync(id);
 
-            if (chatMediaFile == null)
-            {
-                return NotFound();
-            }
+        if (chatMediaFile == null) return NotFound();
+        
+        // Remove Existed Record.
+        _bll.ChatMediaFiles.Remove(chatMediaFile);
+        await _bll.SaveChangesAsync();
 
-            return chatMediaFile;
-        }
-
-        // PUT: api/ChatMediaFile/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutChatMediaFile(Guid id, ChatMediaFile chatMediaFile)
-        {
-            if (id != chatMediaFile.Id)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(chatMediaFile).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!ChatMediaFileExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
-        }
-
-        // POST: api/ChatMediaFile
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
-        public async Task<ActionResult<ChatMediaFile>> PostChatMediaFile(ChatMediaFile chatMediaFile)
-        {
-          if (_context.ChatMediaFiles == null)
-          {
-              return Problem("Entity set 'AppDbContext.ChatMediaFiles'  is null.");
-          }
-            _context.ChatMediaFiles.Add(chatMediaFile);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetChatMediaFile", new { id = chatMediaFile.Id }, chatMediaFile);
-        }
-
-        // DELETE: api/ChatMediaFile/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteChatMediaFile(Guid id)
-        {
-            if (_context.ChatMediaFiles == null)
-            {
-                return NotFound();
-            }
-            var chatMediaFile = await _context.ChatMediaFiles.FindAsync(id);
-            if (chatMediaFile == null)
-            {
-                return NotFound();
-            }
-
-            _context.ChatMediaFiles.Remove(chatMediaFile);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
-        }
-
-        private bool ChatMediaFileExists(Guid id)
-        {
-            return (_context.ChatMediaFiles?.Any(e => e.Id == id)).GetValueOrDefault();
-        }
+        return NoContent();
     }
 }

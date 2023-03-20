@@ -1,124 +1,154 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
+using Api.DTO.v1;
+using AutoMapper;
+using App.Contracts.BLL;
+using Api.DTO.v1.Mappers;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using App.DAL.EF;
-using App.Domain;
 
-namespace WebApp.ApiControllers
+
+namespace WebApp.ApiControllers;
+
+
+/// <summary>
+/// API Controller For Poll Answer Data Transfer.
+/// </summary>
+[ApiController]
+[ApiVersion("1.0")]
+[Route("api/v{version:apiVersion}/[controller]")]
+[ProducesResponseType(StatusCodes.Status400BadRequest)]
+[ProducesResponseType(StatusCodes.Status401Unauthorized)]
+[ProducesResponseType(StatusCodes.Status403Forbidden)]
+public class PollController : ControllerBase 
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class PollAnswerController : ControllerBase
+    /// <summary>
+    /// Business Logic Layer Connection Definition.
+    /// </summary>
+    private readonly IAppBusinessLogic _bll;
+
+    /// <summary>
+    /// Poll Answer Mapper Connection Definition.
+    /// </summary>
+    private readonly PollAnswerMapper _mapper;
+
+    
+    /// <summary>
+    /// Basic API Constructor Defines Business Logic Layer Connection.
+    /// </summary>
+    /// <param name="bll">Defines Business Logic Layer</param>
+    /// <param name="mapper">Mapper Connection Definition.</param>
+    public PollController(IAppBusinessLogic bll, IMapper mapper)
     {
-        private readonly AppDbContext _context;
+        _bll = bll;
+        _mapper = new PollAnswerMapper(mapper);
+    }
 
-        public PollAnswerController(AppDbContext context)
+
+    /// <summary>
+    /// Method Gets All Poll Answers.
+    /// </summary>
+    /// <returns>IEnumerable of Poll Answers.</returns>
+    [HttpGet]
+    [Produces("application/json")]
+    [ProducesResponseType(typeof(IEnumerable<PollAnswer>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<IEnumerable<PollAnswer>>> GetPollAnswers() =>
+        Ok((await _bll.PollAnswers.GetAllAsync()).Select(x => _mapper.Map(x)));
+    
+    
+    /// <summary>
+    /// Method Gets PollAnswer.
+    /// </summary>
+    /// <param name="id">PollAnswer ID Value To Search For PollAnswer.</param>
+    /// <returns>PollAnswer Object.</returns>
+    [HttpGet("{id:guid}")]
+    [Produces("application/json")]
+    [ProducesResponseType(typeof(PollAnswer), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<PollAnswer>> GetPollAnswer(Guid id)
+    {
+        var pollAnswer = await _bll.PollAnswers.FirstOrDefaultAsync(id);
+
+        // Check If Exist In Database.
+        if (pollAnswer == null) return NotFound();
+        
+        return _mapper.Map(pollAnswer)!;
+    }
+    
+    
+    /// <summary>
+    /// Method Updates Record of Poll Answer In Database Layer.
+    /// </summary>
+    /// <param name="id">Poll Answer ID Value of Poll Answer To Be Updated.</param>
+    /// <param name="chat">Defines Poll Answer Value To Be Updated.</param>
+    /// <returns>
+    /// Status Codes:<br/>
+    /// 204 No Content: Update Action Was Successful.<br/>
+    /// 400 Bad Request: ID In URL And ID in DTO Doesn't Match.<br/>
+    /// </returns>
+    [HttpPut("{id:guid}")]
+    [Consumes("application/json")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    public async Task<IActionResult> PutPollAnswer(Guid id, PollAnswer pollAnswer)
+    {
+        if (!id.Equals(pollAnswer.Id))  return BadRequest();
+        
+        // Update State In Database.
+        _bll.PollAnswers.Update(_mapper.Map(pollAnswer)!);
+        await _bll.SaveChangesAsync();
+        
+        return NoContent();
+    }
+
+    /// <summary>
+    /// Method Creates Poll Answer Record In Database Layer.
+    /// </summary>
+    /// <param name="pollAnswer">Object Value To Be Created In Database.</param>
+    /// <returns>Created Poll Answer Object.</returns>
+    [HttpPost]
+    [Produces("application/json")]
+    [Consumes("application/json")]
+    [ProducesResponseType(typeof(PollAnswer), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    public async Task<ActionResult<PollAnswer>> PostPollAnswer(PollAnswer pollAnswer)
+    {
+        if (HttpContext.GetRequestedApiVersion() == null) return BadRequest("API version is not defined.");
+        
+        // Add Amount Unit To The Database Layer.
+        var bllPollAnswer = _bll.PollAnswers.Add(_mapper.Map(pollAnswer)!);
+        await _bll.SaveChangesAsync();
+
+        return CreatedAtAction("GetPollAnswer", new
         {
-            _context = context;
-        }
+            id = bllPollAnswer.Id,
+            version = HttpContext.GetRequestedApiVersion()!.ToString()
+        }, bllPollAnswer);
 
-        // GET: api/PollAnswer
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<PollAnswer>>> GetPollAnswers()
-        {
-          if (_context.PollAnswers == null)
-          {
-              return NotFound();
-          }
-            return await _context.PollAnswers.ToListAsync();
-        }
+    }
 
-        // GET: api/PollAnswer/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<PollAnswer>> GetPollAnswer(Guid id)
-        {
-          if (_context.PollAnswers == null)
-          {
-              return NotFound();
-          }
-            var pollAnswer = await _context.PollAnswers.FindAsync(id);
+    /// <summary>
+    /// Method Deletes Poll Answer In The Database Layer.
+    /// </summary>
+    /// <param name="id">Poll Answer ID Value of Poll Answer To Be Deleted.</param>
+    /// <returns>
+    /// Status codes:<br/>
+    /// 204 No Content: Delete Action Was Successful<br/>
+    /// 404 Not Found: Server Fails To Find Drink Type<br/>
+    /// </returns>
+    [HttpDelete("{id:guid}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> DeletePollAnswer(Guid id)
+    {
+        // Try To Get Record From Database.
+        var pollAnswer = await _bll.PollAnswers.FirstOrDefaultAsync(id);
 
-            if (pollAnswer == null)
-            {
-                return NotFound();
-            }
+        if (pollAnswer == null) return NotFound();
+        
+        // Remove Existed Record.
+        _bll.PollAnswers.Remove(pollAnswer);
+        await _bll.SaveChangesAsync();
 
-            return pollAnswer;
-        }
-
-        // PUT: api/PollAnswer/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutPollAnswer(Guid id, PollAnswer pollAnswer)
-        {
-            if (id != pollAnswer.Id)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(pollAnswer).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!PollAnswerExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
-        }
-
-        // POST: api/PollAnswer
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
-        public async Task<ActionResult<PollAnswer>> PostPollAnswer(PollAnswer pollAnswer)
-        {
-          if (_context.PollAnswers == null)
-          {
-              return Problem("Entity set 'AppDbContext.PollAnswers'  is null.");
-          }
-            _context.PollAnswers.Add(pollAnswer);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetPollAnswer", new { id = pollAnswer.Id }, pollAnswer);
-        }
-
-        // DELETE: api/PollAnswer/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeletePollAnswer(Guid id)
-        {
-            if (_context.PollAnswers == null)
-            {
-                return NotFound();
-            }
-            var pollAnswer = await _context.PollAnswers.FindAsync(id);
-            if (pollAnswer == null)
-            {
-                return NotFound();
-            }
-
-            _context.PollAnswers.Remove(pollAnswer);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
-        }
-
-        private bool PollAnswerExists(Guid id)
-        {
-            return (_context.PollAnswers?.Any(e => e.Id == id)).GetValueOrDefault();
-        }
+        return NoContent();
     }
 }
