@@ -20,7 +20,7 @@ using Microsoft.AspNetCore.Mvc.ApiExplorer;
 
 
 var builder = WebApplication.CreateBuilder(args);
-var dbConnectionString = builder.Configuration.GetConnectionString("NpgsqlConnection");
+var dbConnectionString = builder.Configuration.GetConnectionString("MySqlConnection");
 
 var defaultCulture = builder.Configuration["DefaultCulture"];
 var supportedCultures = builder.Configuration
@@ -33,7 +33,7 @@ var supportedCultures = builder.Configuration
 // Adding Needed Services to Container.
 
 
-builder.Services.AddDbContext<AppDbContext>(options => options.UseNpgsql(dbConnectionString));
+builder.Services.AddDbContext<AppDbContext>(options => options.UseMySQL(dbConnectionString!));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddScoped<IAppUnitOfWork, AppUnitOfWork>();
@@ -160,7 +160,7 @@ builder.Services.AddAutoMapper(
 
 var app = builder.Build();
 
-// AppDataHelper.SetupAppData(app, app.Environment, app.Configuration);
+AppDataHelper.SetupAppData(app, app.Environment, app.Configuration);
 
 
 // Configuring The HTTP Request Pipeline.

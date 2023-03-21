@@ -8,9 +8,8 @@ using Microsoft.EntityFrameworkCore;
 using App.DAL.EF;
 using App.Domain;
 
-namespace WebApp.Areas.Admin.Controllers
+namespace WebApp.Controllers
 {
-    [Area("Admin")]
     public class EventReactionController : Controller
     {
         private readonly AppDbContext _context;
@@ -20,14 +19,14 @@ namespace WebApp.Areas.Admin.Controllers
             _context = context;
         }
 
-        // GET: Admin/EventReaction
+        // GET: EventReaction
         public async Task<IActionResult> Index()
         {
             var appDbContext = _context.EventReactions.Include(e => e.AppUser).Include(e => e.Event).Include(e => e.ReactionType);
             return View(await appDbContext.ToListAsync());
         }
 
-        // GET: Admin/EventReaction/Details/5
+        // GET: EventReaction/Details/5
         public async Task<IActionResult> Details(Guid? id)
         {
             if (id == null || _context.EventReactions == null)
@@ -48,7 +47,7 @@ namespace WebApp.Areas.Admin.Controllers
             return View(eventReaction);
         }
 
-        // GET: Admin/EventReaction/Create
+        // GET: EventReaction/Create
         public IActionResult Create()
         {
             ViewData["AppUserId"] = new SelectList(_context.Users, "Id", "Id");
@@ -57,7 +56,7 @@ namespace WebApp.Areas.Admin.Controllers
             return View();
         }
 
-        // POST: Admin/EventReaction/Create
+        // POST: EventReaction/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
@@ -77,7 +76,7 @@ namespace WebApp.Areas.Admin.Controllers
             return View(eventReaction);
         }
 
-        // GET: Admin/EventReaction/Edit/5
+        // GET: EventReaction/Edit/5
         public async Task<IActionResult> Edit(Guid? id)
         {
             if (id == null || _context.EventReactions == null)
@@ -96,7 +95,7 @@ namespace WebApp.Areas.Admin.Controllers
             return View(eventReaction);
         }
 
-        // POST: Admin/EventReaction/Edit/5
+        // POST: EventReaction/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
@@ -134,7 +133,7 @@ namespace WebApp.Areas.Admin.Controllers
             return View(eventReaction);
         }
 
-        // GET: Admin/EventReaction/Delete/5
+        // GET: EventReaction/Delete/5
         public async Task<IActionResult> Delete(Guid? id)
         {
             if (id == null || _context.EventReactions == null)
@@ -155,7 +154,7 @@ namespace WebApp.Areas.Admin.Controllers
             return View(eventReaction);
         }
 
-        // POST: Admin/EventReaction/Delete/5
+        // POST: EventReaction/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(Guid id)

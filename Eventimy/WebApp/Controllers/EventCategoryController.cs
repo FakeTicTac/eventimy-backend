@@ -8,9 +8,8 @@ using Microsoft.EntityFrameworkCore;
 using App.DAL.EF;
 using App.Domain;
 
-namespace WebApp.Areas.Admin.Controllers
+namespace WebApp.Controllers
 {
-    [Area("Admin")]
     public class EventCategoryController : Controller
     {
         private readonly AppDbContext _context;
@@ -20,14 +19,14 @@ namespace WebApp.Areas.Admin.Controllers
             _context = context;
         }
 
-        // GET: Admin/EventCategory
+        // GET: EventCategory
         public async Task<IActionResult> Index()
         {
             var appDbContext = _context.EventCategories.Include(e => e.ParentCategory);
             return View(await appDbContext.ToListAsync());
         }
 
-        // GET: Admin/EventCategory/Details/5
+        // GET: EventCategory/Details/5
         public async Task<IActionResult> Details(Guid? id)
         {
             if (id == null || _context.EventCategories == null)
@@ -46,14 +45,14 @@ namespace WebApp.Areas.Admin.Controllers
             return View(eventCategory);
         }
 
-        // GET: Admin/EventCategory/Create
+        // GET: EventCategory/Create
         public IActionResult Create()
         {
             ViewData["ParentCategoryId"] = new SelectList(_context.EventCategories, "Id", "Id");
             return View();
         }
 
-        // POST: Admin/EventCategory/Create
+        // POST: EventCategory/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
@@ -71,7 +70,7 @@ namespace WebApp.Areas.Admin.Controllers
             return View(eventCategory);
         }
 
-        // GET: Admin/EventCategory/Edit/5
+        // GET: EventCategory/Edit/5
         public async Task<IActionResult> Edit(Guid? id)
         {
             if (id == null || _context.EventCategories == null)
@@ -88,7 +87,7 @@ namespace WebApp.Areas.Admin.Controllers
             return View(eventCategory);
         }
 
-        // POST: Admin/EventCategory/Edit/5
+        // POST: EventCategory/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
@@ -124,7 +123,7 @@ namespace WebApp.Areas.Admin.Controllers
             return View(eventCategory);
         }
 
-        // GET: Admin/EventCategory/Delete/5
+        // GET: EventCategory/Delete/5
         public async Task<IActionResult> Delete(Guid? id)
         {
             if (id == null || _context.EventCategories == null)
@@ -143,7 +142,7 @@ namespace WebApp.Areas.Admin.Controllers
             return View(eventCategory);
         }
 
-        // POST: Admin/EventCategory/Delete/5
+        // POST: EventCategory/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(Guid id)

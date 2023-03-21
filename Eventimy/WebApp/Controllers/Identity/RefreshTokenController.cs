@@ -6,96 +6,95 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using App.DAL.EF;
-using App.Domain;
+using App.Domain.Identity;
 
-namespace WebApp.Areas.Admin.Controllers
+namespace WebApp.Controllers.Identity
 {
-    [Area("Admin")]
-    public class CityController : Controller
+    public class RefreshTokenController : Controller
     {
         private readonly AppDbContext _context;
 
-        public CityController(AppDbContext context)
+        public RefreshTokenController(AppDbContext context)
         {
             _context = context;
         }
 
-        // GET: Admin/City
+        // GET: RefreshToken
         public async Task<IActionResult> Index()
         {
-            var appDbContext = _context.Cities.Include(c => c.Country);
+            var appDbContext = _context.RefreshTokens.Include(r => r.AppUser);
             return View(await appDbContext.ToListAsync());
         }
 
-        // GET: Admin/City/Details/5
+        // GET: RefreshToken/Details/5
         public async Task<IActionResult> Details(Guid? id)
         {
-            if (id == null || _context.Cities == null)
+            if (id == null || _context.RefreshTokens == null)
             {
                 return NotFound();
             }
 
-            var city = await _context.Cities
-                .Include(c => c.Country)
+            var refreshToken = await _context.RefreshTokens
+                .Include(r => r.AppUser)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (city == null)
+            if (refreshToken == null)
             {
                 return NotFound();
             }
 
-            return View(city);
+            return View(refreshToken);
         }
 
-        // GET: Admin/City/Create
+        // GET: RefreshToken/Create
         public IActionResult Create()
         {
-            ViewData["CountryId"] = new SelectList(_context.Countries, "Id", "Id");
+            ViewData["AppUserId"] = new SelectList(_context.Users, "Id", "Id");
             return View();
         }
 
-        // POST: Admin/City/Create
+        // POST: RefreshToken/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Name,Alpha3Code,CoverImagePath,CountryId,CreatedBy,CreatedAt,ModifiedBy,ModifiedAt,Id")] City city)
+        public async Task<IActionResult> Create([Bind("Signature,ExpirationDateTime,PreviousSignature,PreviousExpirationDateTime,AppUserId,CreatedBy,CreatedAt,ModifiedBy,ModifiedAt,Id")] RefreshToken refreshToken)
         {
             if (ModelState.IsValid)
             {
-                city.Id = Guid.NewGuid();
-                _context.Add(city);
+                refreshToken.Id = Guid.NewGuid();
+                _context.Add(refreshToken);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["CountryId"] = new SelectList(_context.Countries, "Id", "Id", city.CountryId);
-            return View(city);
+            ViewData["AppUserId"] = new SelectList(_context.Users, "Id", "Id", refreshToken.AppUserId);
+            return View(refreshToken);
         }
 
-        // GET: Admin/City/Edit/5
+        // GET: RefreshToken/Edit/5
         public async Task<IActionResult> Edit(Guid? id)
         {
-            if (id == null || _context.Cities == null)
+            if (id == null || _context.RefreshTokens == null)
             {
                 return NotFound();
             }
 
-            var city = await _context.Cities.FindAsync(id);
-            if (city == null)
+            var refreshToken = await _context.RefreshTokens.FindAsync(id);
+            if (refreshToken == null)
             {
                 return NotFound();
             }
-            ViewData["CountryId"] = new SelectList(_context.Countries, "Id", "Id", city.CountryId);
-            return View(city);
+            ViewData["AppUserId"] = new SelectList(_context.Users, "Id", "Id", refreshToken.AppUserId);
+            return View(refreshToken);
         }
 
-        // POST: Admin/City/Edit/5
+        // POST: RefreshToken/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Guid id, [Bind("Name,Alpha3Code,CoverImagePath,CountryId,CreatedBy,CreatedAt,ModifiedBy,ModifiedAt,Id")] City city)
+        public async Task<IActionResult> Edit(Guid id, [Bind("Signature,ExpirationDateTime,PreviousSignature,PreviousExpirationDateTime,AppUserId,CreatedBy,CreatedAt,ModifiedBy,ModifiedAt,Id")] RefreshToken refreshToken)
         {
-            if (id != city.Id)
+            if (id != refreshToken.Id)
             {
                 return NotFound();
             }
@@ -104,12 +103,12 @@ namespace WebApp.Areas.Admin.Controllers
             {
                 try
                 {
-                    _context.Update(city);
+                    _context.Update(refreshToken);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!CityExists(city.Id))
+                    if (!RefreshTokenExists(refreshToken.Id))
                     {
                         return NotFound();
                     }
@@ -120,51 +119,51 @@ namespace WebApp.Areas.Admin.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["CountryId"] = new SelectList(_context.Countries, "Id", "Id", city.CountryId);
-            return View(city);
+            ViewData["AppUserId"] = new SelectList(_context.Users, "Id", "Id", refreshToken.AppUserId);
+            return View(refreshToken);
         }
 
-        // GET: Admin/City/Delete/5
+        // GET: RefreshToken/Delete/5
         public async Task<IActionResult> Delete(Guid? id)
         {
-            if (id == null || _context.Cities == null)
+            if (id == null || _context.RefreshTokens == null)
             {
                 return NotFound();
             }
 
-            var city = await _context.Cities
-                .Include(c => c.Country)
+            var refreshToken = await _context.RefreshTokens
+                .Include(r => r.AppUser)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (city == null)
+            if (refreshToken == null)
             {
                 return NotFound();
             }
 
-            return View(city);
+            return View(refreshToken);
         }
 
-        // POST: Admin/City/Delete/5
+        // POST: RefreshToken/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(Guid id)
         {
-            if (_context.Cities == null)
+            if (_context.RefreshTokens == null)
             {
-                return Problem("Entity set 'AppDbContext.Cities'  is null.");
+                return Problem("Entity set 'AppDbContext.RefreshTokens'  is null.");
             }
-            var city = await _context.Cities.FindAsync(id);
-            if (city != null)
+            var refreshToken = await _context.RefreshTokens.FindAsync(id);
+            if (refreshToken != null)
             {
-                _context.Cities.Remove(city);
+                _context.RefreshTokens.Remove(refreshToken);
             }
             
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool CityExists(Guid id)
+        private bool RefreshTokenExists(Guid id)
         {
-          return (_context.Cities?.Any(e => e.Id == id)).GetValueOrDefault();
+          return (_context.RefreshTokens?.Any(e => e.Id == id)).GetValueOrDefault();
         }
     }
 }

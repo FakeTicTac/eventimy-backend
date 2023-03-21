@@ -8,9 +8,8 @@ using Microsoft.EntityFrameworkCore;
 using App.DAL.EF;
 using App.Domain;
 
-namespace WebApp.Areas.Admin.Controllers
+namespace WebApp.Controllers
 {
-    [Area("Admin")]
     public class PollAnswerController : Controller
     {
         private readonly AppDbContext _context;
@@ -20,14 +19,14 @@ namespace WebApp.Areas.Admin.Controllers
             _context = context;
         }
 
-        // GET: Admin/PollAnswer
+        // GET: PollAnswer
         public async Task<IActionResult> Index()
         {
             var appDbContext = _context.PollAnswers.Include(p => p.ChatParticipant).Include(p => p.PollOption);
             return View(await appDbContext.ToListAsync());
         }
 
-        // GET: Admin/PollAnswer/Details/5
+        // GET: PollAnswer/Details/5
         public async Task<IActionResult> Details(Guid? id)
         {
             if (id == null || _context.PollAnswers == null)
@@ -47,7 +46,7 @@ namespace WebApp.Areas.Admin.Controllers
             return View(pollAnswer);
         }
 
-        // GET: Admin/PollAnswer/Create
+        // GET: PollAnswer/Create
         public IActionResult Create()
         {
             ViewData["ChatParticipantId"] = new SelectList(_context.ChatParticipants, "Id", "Id");
@@ -55,7 +54,7 @@ namespace WebApp.Areas.Admin.Controllers
             return View();
         }
 
-        // POST: Admin/PollAnswer/Create
+        // POST: PollAnswer/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
@@ -74,7 +73,7 @@ namespace WebApp.Areas.Admin.Controllers
             return View(pollAnswer);
         }
 
-        // GET: Admin/PollAnswer/Edit/5
+        // GET: PollAnswer/Edit/5
         public async Task<IActionResult> Edit(Guid? id)
         {
             if (id == null || _context.PollAnswers == null)
@@ -92,7 +91,7 @@ namespace WebApp.Areas.Admin.Controllers
             return View(pollAnswer);
         }
 
-        // POST: Admin/PollAnswer/Edit/5
+        // POST: PollAnswer/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
@@ -129,7 +128,7 @@ namespace WebApp.Areas.Admin.Controllers
             return View(pollAnswer);
         }
 
-        // GET: Admin/PollAnswer/Delete/5
+        // GET: PollAnswer/Delete/5
         public async Task<IActionResult> Delete(Guid? id)
         {
             if (id == null || _context.PollAnswers == null)
@@ -149,7 +148,7 @@ namespace WebApp.Areas.Admin.Controllers
             return View(pollAnswer);
         }
 
-        // POST: Admin/PollAnswer/Delete/5
+        // POST: PollAnswer/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(Guid id)

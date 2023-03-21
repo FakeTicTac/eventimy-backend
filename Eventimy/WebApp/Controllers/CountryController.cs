@@ -8,91 +8,90 @@ using Microsoft.EntityFrameworkCore;
 using App.DAL.EF;
 using App.Domain;
 
-namespace WebApp.Areas.Admin.Controllers
+namespace WebApp.Controllers
 {
-    [Area("Admin")]
-    public class MediaFileTypeController : Controller
+    public class CountryController : Controller
     {
         private readonly AppDbContext _context;
 
-        public MediaFileTypeController(AppDbContext context)
+        public CountryController(AppDbContext context)
         {
             _context = context;
         }
 
-        // GET: Admin/MediaFileType
+        // GET: Country
         public async Task<IActionResult> Index()
         {
-              return _context.MediaFileTypes != null ? 
-                          View(await _context.MediaFileTypes.ToListAsync()) :
-                          Problem("Entity set 'AppDbContext.MediaFileTypes'  is null.");
+              return _context.Countries != null ? 
+                          View(await _context.Countries.ToListAsync()) :
+                          Problem("Entity set 'AppDbContext.Countries'  is null.");
         }
 
-        // GET: Admin/MediaFileType/Details/5
+        // GET: Country/Details/5
         public async Task<IActionResult> Details(Guid? id)
         {
-            if (id == null || _context.MediaFileTypes == null)
+            if (id == null || _context.Countries == null)
             {
                 return NotFound();
             }
 
-            var mediaFileType = await _context.MediaFileTypes
+            var country = await _context.Countries
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (mediaFileType == null)
+            if (country == null)
             {
                 return NotFound();
             }
 
-            return View(mediaFileType);
+            return View(country);
         }
 
-        // GET: Admin/MediaFileType/Create
+        // GET: Country/Create
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: Admin/MediaFileType/Create
+        // POST: Country/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Name,SignImagePath,CreatedBy,CreatedAt,ModifiedBy,ModifiedAt,Id")] MediaFileType mediaFileType)
+        public async Task<IActionResult> Create([Bind("Name,Alpha3Code,CoverImagePath,CreatedBy,CreatedAt,ModifiedBy,ModifiedAt,Id")] Country country)
         {
             if (ModelState.IsValid)
             {
-                mediaFileType.Id = Guid.NewGuid();
-                _context.Add(mediaFileType);
+                country.Id = Guid.NewGuid();
+                _context.Add(country);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(mediaFileType);
+            return View(country);
         }
 
-        // GET: Admin/MediaFileType/Edit/5
+        // GET: Country/Edit/5
         public async Task<IActionResult> Edit(Guid? id)
         {
-            if (id == null || _context.MediaFileTypes == null)
+            if (id == null || _context.Countries == null)
             {
                 return NotFound();
             }
 
-            var mediaFileType = await _context.MediaFileTypes.FindAsync(id);
-            if (mediaFileType == null)
+            var country = await _context.Countries.FindAsync(id);
+            if (country == null)
             {
                 return NotFound();
             }
-            return View(mediaFileType);
+            return View(country);
         }
 
-        // POST: Admin/MediaFileType/Edit/5
+        // POST: Country/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Guid id, [Bind("Name,SignImagePath,CreatedBy,CreatedAt,ModifiedBy,ModifiedAt,Id")] MediaFileType mediaFileType)
+        public async Task<IActionResult> Edit(Guid id, [Bind("Name,Alpha3Code,CoverImagePath,CreatedBy,CreatedAt,ModifiedBy,ModifiedAt,Id")] Country country)
         {
-            if (id != mediaFileType.Id)
+            if (id != country.Id)
             {
                 return NotFound();
             }
@@ -101,12 +100,12 @@ namespace WebApp.Areas.Admin.Controllers
             {
                 try
                 {
-                    _context.Update(mediaFileType);
+                    _context.Update(country);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!MediaFileTypeExists(mediaFileType.Id))
+                    if (!CountryExists(country.Id))
                     {
                         return NotFound();
                     }
@@ -117,49 +116,49 @@ namespace WebApp.Areas.Admin.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(mediaFileType);
+            return View(country);
         }
 
-        // GET: Admin/MediaFileType/Delete/5
+        // GET: Country/Delete/5
         public async Task<IActionResult> Delete(Guid? id)
         {
-            if (id == null || _context.MediaFileTypes == null)
+            if (id == null || _context.Countries == null)
             {
                 return NotFound();
             }
 
-            var mediaFileType = await _context.MediaFileTypes
+            var country = await _context.Countries
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (mediaFileType == null)
+            if (country == null)
             {
                 return NotFound();
             }
 
-            return View(mediaFileType);
+            return View(country);
         }
 
-        // POST: Admin/MediaFileType/Delete/5
+        // POST: Country/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(Guid id)
         {
-            if (_context.MediaFileTypes == null)
+            if (_context.Countries == null)
             {
-                return Problem("Entity set 'AppDbContext.MediaFileTypes'  is null.");
+                return Problem("Entity set 'AppDbContext.Countries'  is null.");
             }
-            var mediaFileType = await _context.MediaFileTypes.FindAsync(id);
-            if (mediaFileType != null)
+            var country = await _context.Countries.FindAsync(id);
+            if (country != null)
             {
-                _context.MediaFileTypes.Remove(mediaFileType);
+                _context.Countries.Remove(country);
             }
             
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool MediaFileTypeExists(Guid id)
+        private bool CountryExists(Guid id)
         {
-          return (_context.MediaFileTypes?.Any(e => e.Id == id)).GetValueOrDefault();
+          return (_context.Countries?.Any(e => e.Id == id)).GetValueOrDefault();
         }
     }
 }

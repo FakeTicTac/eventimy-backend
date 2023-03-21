@@ -8,9 +8,8 @@ using Microsoft.EntityFrameworkCore;
 using App.DAL.EF;
 using App.Domain;
 
-namespace WebApp.Areas.Admin.Controllers
+namespace WebApp.Controllers
 {
-    [Area("Admin")]
     public class PerformerTypeController : Controller
     {
         private readonly AppDbContext _context;
@@ -20,7 +19,7 @@ namespace WebApp.Areas.Admin.Controllers
             _context = context;
         }
 
-        // GET: Admin/PerformerType
+        // GET: PerformerType
         public async Task<IActionResult> Index()
         {
               return _context.PerformerTypes != null ? 
@@ -28,7 +27,7 @@ namespace WebApp.Areas.Admin.Controllers
                           Problem("Entity set 'AppDbContext.PerformerTypes'  is null.");
         }
 
-        // GET: Admin/PerformerType/Details/5
+        // GET: PerformerType/Details/5
         public async Task<IActionResult> Details(Guid? id)
         {
             if (id == null || _context.PerformerTypes == null)
@@ -46,13 +45,13 @@ namespace WebApp.Areas.Admin.Controllers
             return View(performerType);
         }
 
-        // GET: Admin/PerformerType/Create
+        // GET: PerformerType/Create
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: Admin/PerformerType/Create
+        // POST: PerformerType/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
@@ -69,7 +68,7 @@ namespace WebApp.Areas.Admin.Controllers
             return View(performerType);
         }
 
-        // GET: Admin/PerformerType/Edit/5
+        // GET: PerformerType/Edit/5
         public async Task<IActionResult> Edit(Guid? id)
         {
             if (id == null || _context.PerformerTypes == null)
@@ -85,7 +84,7 @@ namespace WebApp.Areas.Admin.Controllers
             return View(performerType);
         }
 
-        // POST: Admin/PerformerType/Edit/5
+        // POST: PerformerType/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
@@ -120,7 +119,7 @@ namespace WebApp.Areas.Admin.Controllers
             return View(performerType);
         }
 
-        // GET: Admin/PerformerType/Delete/5
+        // GET: PerformerType/Delete/5
         public async Task<IActionResult> Delete(Guid? id)
         {
             if (id == null || _context.PerformerTypes == null)
@@ -138,7 +137,7 @@ namespace WebApp.Areas.Admin.Controllers
             return View(performerType);
         }
 
-        // POST: Admin/PerformerType/Delete/5
+        // POST: PerformerType/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(Guid id)

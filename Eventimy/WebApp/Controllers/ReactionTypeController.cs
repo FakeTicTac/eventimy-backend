@@ -8,9 +8,8 @@ using Microsoft.EntityFrameworkCore;
 using App.DAL.EF;
 using App.Domain;
 
-namespace WebApp.Areas.Admin.Controllers
+namespace WebApp.Controllers
 {
-    [Area("Admin")]
     public class ReactionTypeController : Controller
     {
         private readonly AppDbContext _context;
@@ -20,7 +19,7 @@ namespace WebApp.Areas.Admin.Controllers
             _context = context;
         }
 
-        // GET: Admin/ReactionType
+        // GET: ReactionType
         public async Task<IActionResult> Index()
         {
               return _context.ReactionTypes != null ? 
@@ -28,7 +27,7 @@ namespace WebApp.Areas.Admin.Controllers
                           Problem("Entity set 'AppDbContext.ReactionTypes'  is null.");
         }
 
-        // GET: Admin/ReactionType/Details/5
+        // GET: ReactionType/Details/5
         public async Task<IActionResult> Details(Guid? id)
         {
             if (id == null || _context.ReactionTypes == null)
@@ -46,13 +45,13 @@ namespace WebApp.Areas.Admin.Controllers
             return View(reactionType);
         }
 
-        // GET: Admin/ReactionType/Create
+        // GET: ReactionType/Create
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: Admin/ReactionType/Create
+        // POST: ReactionType/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
@@ -69,7 +68,7 @@ namespace WebApp.Areas.Admin.Controllers
             return View(reactionType);
         }
 
-        // GET: Admin/ReactionType/Edit/5
+        // GET: ReactionType/Edit/5
         public async Task<IActionResult> Edit(Guid? id)
         {
             if (id == null || _context.ReactionTypes == null)
@@ -85,7 +84,7 @@ namespace WebApp.Areas.Admin.Controllers
             return View(reactionType);
         }
 
-        // POST: Admin/ReactionType/Edit/5
+        // POST: ReactionType/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
@@ -120,7 +119,7 @@ namespace WebApp.Areas.Admin.Controllers
             return View(reactionType);
         }
 
-        // GET: Admin/ReactionType/Delete/5
+        // GET: ReactionType/Delete/5
         public async Task<IActionResult> Delete(Guid? id)
         {
             if (id == null || _context.ReactionTypes == null)
@@ -138,7 +137,7 @@ namespace WebApp.Areas.Admin.Controllers
             return View(reactionType);
         }
 
-        // POST: Admin/ReactionType/Delete/5
+        // POST: ReactionType/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(Guid id)

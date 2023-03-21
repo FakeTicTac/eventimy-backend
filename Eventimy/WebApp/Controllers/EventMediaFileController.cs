@@ -8,9 +8,8 @@ using Microsoft.EntityFrameworkCore;
 using App.DAL.EF;
 using App.Domain;
 
-namespace WebApp.Areas.Admin.Controllers
+namespace WebApp.Controllers
 {
-    [Area("Admin")]
     public class EventMediaFileController : Controller
     {
         private readonly AppDbContext _context;
@@ -20,14 +19,14 @@ namespace WebApp.Areas.Admin.Controllers
             _context = context;
         }
 
-        // GET: Admin/EventMediaFile
+        // GET: EventMediaFile
         public async Task<IActionResult> Index()
         {
             var appDbContext = _context.EventMediaFiles.Include(e => e.Event).Include(e => e.MediaFileType);
             return View(await appDbContext.ToListAsync());
         }
 
-        // GET: Admin/EventMediaFile/Details/5
+        // GET: EventMediaFile/Details/5
         public async Task<IActionResult> Details(Guid? id)
         {
             if (id == null || _context.EventMediaFiles == null)
@@ -47,7 +46,7 @@ namespace WebApp.Areas.Admin.Controllers
             return View(eventMediaFile);
         }
 
-        // GET: Admin/EventMediaFile/Create
+        // GET: EventMediaFile/Create
         public IActionResult Create()
         {
             ViewData["EventId"] = new SelectList(_context.Events, "Id", "Id");
@@ -55,7 +54,7 @@ namespace WebApp.Areas.Admin.Controllers
             return View();
         }
 
-        // POST: Admin/EventMediaFile/Create
+        // POST: EventMediaFile/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
@@ -74,7 +73,7 @@ namespace WebApp.Areas.Admin.Controllers
             return View(eventMediaFile);
         }
 
-        // GET: Admin/EventMediaFile/Edit/5
+        // GET: EventMediaFile/Edit/5
         public async Task<IActionResult> Edit(Guid? id)
         {
             if (id == null || _context.EventMediaFiles == null)
@@ -92,7 +91,7 @@ namespace WebApp.Areas.Admin.Controllers
             return View(eventMediaFile);
         }
 
-        // POST: Admin/EventMediaFile/Edit/5
+        // POST: EventMediaFile/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
@@ -129,7 +128,7 @@ namespace WebApp.Areas.Admin.Controllers
             return View(eventMediaFile);
         }
 
-        // GET: Admin/EventMediaFile/Delete/5
+        // GET: EventMediaFile/Delete/5
         public async Task<IActionResult> Delete(Guid? id)
         {
             if (id == null || _context.EventMediaFiles == null)
@@ -149,7 +148,7 @@ namespace WebApp.Areas.Admin.Controllers
             return View(eventMediaFile);
         }
 
-        // POST: Admin/EventMediaFile/Delete/5
+        // POST: EventMediaFile/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(Guid id)

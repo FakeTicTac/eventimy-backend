@@ -8,91 +8,93 @@ using Microsoft.EntityFrameworkCore;
 using App.DAL.EF;
 using App.Domain;
 
-namespace WebApp.Areas.Admin.Controllers
+namespace WebApp.Controllers
 {
-    [Area("Admin")]
-    public class CountryController : Controller
+    public class CityController : Controller
     {
         private readonly AppDbContext _context;
 
-        public CountryController(AppDbContext context)
+        public CityController(AppDbContext context)
         {
             _context = context;
         }
 
-        // GET: Admin/Country
+        // GET: City
         public async Task<IActionResult> Index()
         {
-              return _context.Countries != null ? 
-                          View(await _context.Countries.ToListAsync()) :
-                          Problem("Entity set 'AppDbContext.Countries'  is null.");
+            var appDbContext = _context.Cities.Include(c => c.Country);
+            return View(await appDbContext.ToListAsync());
         }
 
-        // GET: Admin/Country/Details/5
+        // GET: City/Details/5
         public async Task<IActionResult> Details(Guid? id)
         {
-            if (id == null || _context.Countries == null)
+            if (id == null || _context.Cities == null)
             {
                 return NotFound();
             }
 
-            var country = await _context.Countries
+            var city = await _context.Cities
+                .Include(c => c.Country)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (country == null)
+            if (city == null)
             {
                 return NotFound();
             }
 
-            return View(country);
+            return View(city);
         }
 
-        // GET: Admin/Country/Create
+        // GET: City/Create
         public IActionResult Create()
         {
+            ViewData["CountryId"] = new SelectList(_context.Countries, "Id", "Id");
             return View();
         }
 
-        // POST: Admin/Country/Create
+        // POST: City/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Name,Alpha3Code,CoverImagePath,CreatedBy,CreatedAt,ModifiedBy,ModifiedAt,Id")] Country country)
+        public async Task<IActionResult> Create([Bind("Name,Alpha3Code,CoverImagePath,CountryId,CreatedBy,CreatedAt,ModifiedBy,ModifiedAt,Id")] City city)
         {
             if (ModelState.IsValid)
             {
-                country.Id = Guid.NewGuid();
-                _context.Add(country);
+                city.Id = Guid.NewGuid();
+                _context.Add(city);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(country);
+            ViewData["CountryId"] = new SelectList(_context.Countries, "Id", "Id", city.CountryId);
+            return View(city);
         }
 
-        // GET: Admin/Country/Edit/5
+        // GET: City/Edit/5
         public async Task<IActionResult> Edit(Guid? id)
         {
-            if (id == null || _context.Countries == null)
+            if (id == null || _context.Cities == null)
             {
                 return NotFound();
             }
 
-            var country = await _context.Countries.FindAsync(id);
-            if (country == null)
+            var city = await _context.Cities.FindAsync(id);
+            if (city == null)
             {
                 return NotFound();
             }
-            return View(country);
+            ViewData["CountryId"] = new SelectList(_context.Countries, "Id", "Id", city.CountryId);
+            return View(city);
         }
 
-        // POST: Admin/Country/Edit/5
+        // POST: City/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Guid id, [Bind("Name,Alpha3Code,CoverImagePath,CreatedBy,CreatedAt,ModifiedBy,ModifiedAt,Id")] Country country)
+        public async Task<IActionResult> Edit(Guid id, [Bind("Name,Alpha3Code,CoverImagePath,CountryId,CreatedBy,CreatedAt,ModifiedBy,ModifiedAt,Id")] City city)
         {
-            if (id != country.Id)
+            if (id != city.Id)
             {
                 return NotFound();
             }
@@ -101,12 +103,12 @@ namespace WebApp.Areas.Admin.Controllers
             {
                 try
                 {
-                    _context.Update(country);
+                    _context.Update(city);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!CountryExists(country.Id))
+                    if (!CityExists(city.Id))
                     {
                         return NotFound();
                     }
@@ -117,49 +119,51 @@ namespace WebApp.Areas.Admin.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(country);
+            ViewData["CountryId"] = new SelectList(_context.Countries, "Id", "Id", city.CountryId);
+            return View(city);
         }
 
-        // GET: Admin/Country/Delete/5
+        // GET: City/Delete/5
         public async Task<IActionResult> Delete(Guid? id)
         {
-            if (id == null || _context.Countries == null)
+            if (id == null || _context.Cities == null)
             {
                 return NotFound();
             }
 
-            var country = await _context.Countries
+            var city = await _context.Cities
+                .Include(c => c.Country)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (country == null)
+            if (city == null)
             {
                 return NotFound();
             }
 
-            return View(country);
+            return View(city);
         }
 
-        // POST: Admin/Country/Delete/5
+        // POST: City/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(Guid id)
         {
-            if (_context.Countries == null)
+            if (_context.Cities == null)
             {
-                return Problem("Entity set 'AppDbContext.Countries'  is null.");
+                return Problem("Entity set 'AppDbContext.Cities'  is null.");
             }
-            var country = await _context.Countries.FindAsync(id);
-            if (country != null)
+            var city = await _context.Cities.FindAsync(id);
+            if (city != null)
             {
-                _context.Countries.Remove(country);
+                _context.Cities.Remove(city);
             }
             
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool CountryExists(Guid id)
+        private bool CityExists(Guid id)
         {
-          return (_context.Countries?.Any(e => e.Id == id)).GetValueOrDefault();
+          return (_context.Cities?.Any(e => e.Id == id)).GetValueOrDefault();
         }
     }
 }

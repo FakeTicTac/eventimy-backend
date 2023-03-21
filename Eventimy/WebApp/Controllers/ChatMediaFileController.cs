@@ -8,9 +8,8 @@ using Microsoft.EntityFrameworkCore;
 using App.DAL.EF;
 using App.Domain;
 
-namespace WebApp.Areas.Admin.Controllers
+namespace WebApp.Controllers
 {
-    [Area("Admin")]
     public class ChatMediaFileController : Controller
     {
         private readonly AppDbContext _context;
@@ -20,14 +19,14 @@ namespace WebApp.Areas.Admin.Controllers
             _context = context;
         }
 
-        // GET: Admin/ChatMediaFile
+        // GET: ChatMediaFile
         public async Task<IActionResult> Index()
         {
             var appDbContext = _context.ChatMediaFiles.Include(c => c.Chat).Include(c => c.ChatMessage).Include(c => c.MediaFileType);
             return View(await appDbContext.ToListAsync());
         }
 
-        // GET: Admin/ChatMediaFile/Details/5
+        // GET: ChatMediaFile/Details/5
         public async Task<IActionResult> Details(Guid? id)
         {
             if (id == null || _context.ChatMediaFiles == null)
@@ -48,7 +47,7 @@ namespace WebApp.Areas.Admin.Controllers
             return View(chatMediaFile);
         }
 
-        // GET: Admin/ChatMediaFile/Create
+        // GET: ChatMediaFile/Create
         public IActionResult Create()
         {
             ViewData["ChatId"] = new SelectList(_context.Chats, "Id", "Id");
@@ -57,7 +56,7 @@ namespace WebApp.Areas.Admin.Controllers
             return View();
         }
 
-        // POST: Admin/ChatMediaFile/Create
+        // POST: ChatMediaFile/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
@@ -77,7 +76,7 @@ namespace WebApp.Areas.Admin.Controllers
             return View(chatMediaFile);
         }
 
-        // GET: Admin/ChatMediaFile/Edit/5
+        // GET: ChatMediaFile/Edit/5
         public async Task<IActionResult> Edit(Guid? id)
         {
             if (id == null || _context.ChatMediaFiles == null)
@@ -96,7 +95,7 @@ namespace WebApp.Areas.Admin.Controllers
             return View(chatMediaFile);
         }
 
-        // POST: Admin/ChatMediaFile/Edit/5
+        // POST: ChatMediaFile/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
@@ -134,7 +133,7 @@ namespace WebApp.Areas.Admin.Controllers
             return View(chatMediaFile);
         }
 
-        // GET: Admin/ChatMediaFile/Delete/5
+        // GET: ChatMediaFile/Delete/5
         public async Task<IActionResult> Delete(Guid? id)
         {
             if (id == null || _context.ChatMediaFiles == null)
@@ -155,7 +154,7 @@ namespace WebApp.Areas.Admin.Controllers
             return View(chatMediaFile);
         }
 
-        // POST: Admin/ChatMediaFile/Delete/5
+        // POST: ChatMediaFile/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(Guid id)

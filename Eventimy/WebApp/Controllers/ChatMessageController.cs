@@ -8,46 +8,45 @@ using Microsoft.EntityFrameworkCore;
 using App.DAL.EF;
 using App.Domain;
 
-namespace WebApp.Areas.Admin.Controllers
+namespace WebApp.Controllers
 {
-    [Area("Admin")]
-    public class ChatPollController : Controller
+    public class ChatMessageController : Controller
     {
         private readonly AppDbContext _context;
 
-        public ChatPollController(AppDbContext context)
+        public ChatMessageController(AppDbContext context)
         {
             _context = context;
         }
 
-        // GET: Admin/ChatPoll
+        // GET: ChatMessage
         public async Task<IActionResult> Index()
         {
-            var appDbContext = _context.ChatPolls.Include(c => c.Chat).Include(c => c.ChatParticipant);
+            var appDbContext = _context.ChatMessages.Include(c => c.Chat).Include(c => c.ChatParticipant);
             return View(await appDbContext.ToListAsync());
         }
 
-        // GET: Admin/ChatPoll/Details/5
+        // GET: ChatMessage/Details/5
         public async Task<IActionResult> Details(Guid? id)
         {
-            if (id == null || _context.ChatPolls == null)
+            if (id == null || _context.ChatMessages == null)
             {
                 return NotFound();
             }
 
-            var chatPoll = await _context.ChatPolls
+            var chatMessage = await _context.ChatMessages
                 .Include(c => c.Chat)
                 .Include(c => c.ChatParticipant)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (chatPoll == null)
+            if (chatMessage == null)
             {
                 return NotFound();
             }
 
-            return View(chatPoll);
+            return View(chatMessage);
         }
 
-        // GET: Admin/ChatPoll/Create
+        // GET: ChatMessage/Create
         public IActionResult Create()
         {
             ViewData["ChatId"] = new SelectList(_context.Chats, "Id", "Id");
@@ -55,51 +54,51 @@ namespace WebApp.Areas.Admin.Controllers
             return View();
         }
 
-        // POST: Admin/ChatPoll/Create
+        // POST: ChatMessage/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Title,IsAnonymous,IsMultipleChoice,CanChangeVote,IsLimitedTime,EndTime,ChatId,ChatParticipantId,CreatedBy,CreatedAt,ModifiedBy,ModifiedAt,Id")] ChatPoll chatPoll)
+        public async Task<IActionResult> Create([Bind("Content,IsPinned,ChatId,ChatParticipantId,CreatedBy,CreatedAt,ModifiedBy,ModifiedAt,Id")] ChatMessage chatMessage)
         {
             if (ModelState.IsValid)
             {
-                chatPoll.Id = Guid.NewGuid();
-                _context.Add(chatPoll);
+                chatMessage.Id = Guid.NewGuid();
+                _context.Add(chatMessage);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["ChatId"] = new SelectList(_context.Chats, "Id", "Id", chatPoll.ChatId);
-            ViewData["ChatParticipantId"] = new SelectList(_context.ChatParticipants, "Id", "Id", chatPoll.ChatParticipantId);
-            return View(chatPoll);
+            ViewData["ChatId"] = new SelectList(_context.Chats, "Id", "Id", chatMessage.ChatId);
+            ViewData["ChatParticipantId"] = new SelectList(_context.ChatParticipants, "Id", "Id", chatMessage.ChatParticipantId);
+            return View(chatMessage);
         }
 
-        // GET: Admin/ChatPoll/Edit/5
+        // GET: ChatMessage/Edit/5
         public async Task<IActionResult> Edit(Guid? id)
         {
-            if (id == null || _context.ChatPolls == null)
+            if (id == null || _context.ChatMessages == null)
             {
                 return NotFound();
             }
 
-            var chatPoll = await _context.ChatPolls.FindAsync(id);
-            if (chatPoll == null)
+            var chatMessage = await _context.ChatMessages.FindAsync(id);
+            if (chatMessage == null)
             {
                 return NotFound();
             }
-            ViewData["ChatId"] = new SelectList(_context.Chats, "Id", "Id", chatPoll.ChatId);
-            ViewData["ChatParticipantId"] = new SelectList(_context.ChatParticipants, "Id", "Id", chatPoll.ChatParticipantId);
-            return View(chatPoll);
+            ViewData["ChatId"] = new SelectList(_context.Chats, "Id", "Id", chatMessage.ChatId);
+            ViewData["ChatParticipantId"] = new SelectList(_context.ChatParticipants, "Id", "Id", chatMessage.ChatParticipantId);
+            return View(chatMessage);
         }
 
-        // POST: Admin/ChatPoll/Edit/5
+        // POST: ChatMessage/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Guid id, [Bind("Title,IsAnonymous,IsMultipleChoice,CanChangeVote,IsLimitedTime,EndTime,ChatId,ChatParticipantId,CreatedBy,CreatedAt,ModifiedBy,ModifiedAt,Id")] ChatPoll chatPoll)
+        public async Task<IActionResult> Edit(Guid id, [Bind("Content,IsPinned,ChatId,ChatParticipantId,CreatedBy,CreatedAt,ModifiedBy,ModifiedAt,Id")] ChatMessage chatMessage)
         {
-            if (id != chatPoll.Id)
+            if (id != chatMessage.Id)
             {
                 return NotFound();
             }
@@ -108,12 +107,12 @@ namespace WebApp.Areas.Admin.Controllers
             {
                 try
                 {
-                    _context.Update(chatPoll);
+                    _context.Update(chatMessage);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!ChatPollExists(chatPoll.Id))
+                    if (!ChatMessageExists(chatMessage.Id))
                     {
                         return NotFound();
                     }
@@ -124,53 +123,53 @@ namespace WebApp.Areas.Admin.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["ChatId"] = new SelectList(_context.Chats, "Id", "Id", chatPoll.ChatId);
-            ViewData["ChatParticipantId"] = new SelectList(_context.ChatParticipants, "Id", "Id", chatPoll.ChatParticipantId);
-            return View(chatPoll);
+            ViewData["ChatId"] = new SelectList(_context.Chats, "Id", "Id", chatMessage.ChatId);
+            ViewData["ChatParticipantId"] = new SelectList(_context.ChatParticipants, "Id", "Id", chatMessage.ChatParticipantId);
+            return View(chatMessage);
         }
 
-        // GET: Admin/ChatPoll/Delete/5
+        // GET: ChatMessage/Delete/5
         public async Task<IActionResult> Delete(Guid? id)
         {
-            if (id == null || _context.ChatPolls == null)
+            if (id == null || _context.ChatMessages == null)
             {
                 return NotFound();
             }
 
-            var chatPoll = await _context.ChatPolls
+            var chatMessage = await _context.ChatMessages
                 .Include(c => c.Chat)
                 .Include(c => c.ChatParticipant)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (chatPoll == null)
+            if (chatMessage == null)
             {
                 return NotFound();
             }
 
-            return View(chatPoll);
+            return View(chatMessage);
         }
 
-        // POST: Admin/ChatPoll/Delete/5
+        // POST: ChatMessage/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(Guid id)
         {
-            if (_context.ChatPolls == null)
+            if (_context.ChatMessages == null)
             {
-                return Problem("Entity set 'AppDbContext.ChatPolls'  is null.");
+                return Problem("Entity set 'AppDbContext.ChatMessages'  is null.");
             }
-            var chatPoll = await _context.ChatPolls.FindAsync(id);
-            if (chatPoll != null)
+            var chatMessage = await _context.ChatMessages.FindAsync(id);
+            if (chatMessage != null)
             {
-                _context.ChatPolls.Remove(chatPoll);
+                _context.ChatMessages.Remove(chatMessage);
             }
             
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool ChatPollExists(Guid id)
+        private bool ChatMessageExists(Guid id)
         {
-          return (_context.ChatPolls?.Any(e => e.Id == id)).GetValueOrDefault();
+          return (_context.ChatMessages?.Any(e => e.Id == id)).GetValueOrDefault();
         }
     }
 }

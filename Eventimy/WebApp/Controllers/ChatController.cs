@@ -8,94 +8,97 @@ using Microsoft.EntityFrameworkCore;
 using App.DAL.EF;
 using App.Domain;
 
-namespace WebApp.Areas.Admin.Controllers
+namespace WebApp.Controllers
 {
-    [Area("Admin")]
-    public class PollOptionController : Controller
+    public class ChatController : Controller
     {
         private readonly AppDbContext _context;
 
-        public PollOptionController(AppDbContext context)
+        public ChatController(AppDbContext context)
         {
             _context = context;
         }
 
-        // GET: Admin/PollOption
+        // GET: Chat
         public async Task<IActionResult> Index()
         {
-            var appDbContext = _context.PollOptions.Include(p => p.ChatPoll);
+            var appDbContext = _context.Chats.Include(c => c.AppUser).Include(c => c.Event);
             return View(await appDbContext.ToListAsync());
         }
 
-        // GET: Admin/PollOption/Details/5
+        // GET: Chat/Details/5
         public async Task<IActionResult> Details(Guid? id)
         {
-            if (id == null || _context.PollOptions == null)
+            if (id == null || _context.Chats == null)
             {
                 return NotFound();
             }
 
-            var pollOption = await _context.PollOptions
-                .Include(p => p.ChatPoll)
+            var chat = await _context.Chats
+                .Include(c => c.AppUser)
+                .Include(c => c.Event)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (pollOption == null)
+            if (chat == null)
             {
                 return NotFound();
             }
 
-            return View(pollOption);
+            return View(chat);
         }
 
-        // GET: Admin/PollOption/Create
+        // GET: Chat/Create
         public IActionResult Create()
         {
-            ViewData["ChatPollId"] = new SelectList(_context.ChatPolls, "Id", "Id");
+            ViewData["AppUserId"] = new SelectList(_context.Users, "Id", "Id");
+            ViewData["EventId"] = new SelectList(_context.Events, "Id", "Id");
             return View();
         }
 
-        // POST: Admin/PollOption/Create
+        // POST: Chat/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Value,ChatPollId,CreatedBy,CreatedAt,ModifiedBy,ModifiedAt,Id")] PollOption pollOption)
+        public async Task<IActionResult> Create([Bind("Title,ThumbNailImage,EventId,AppUserId,CreatedBy,CreatedAt,ModifiedBy,ModifiedAt,Id")] Chat chat)
         {
             if (ModelState.IsValid)
             {
-                pollOption.Id = Guid.NewGuid();
-                _context.Add(pollOption);
+                chat.Id = Guid.NewGuid();
+                _context.Add(chat);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["ChatPollId"] = new SelectList(_context.ChatPolls, "Id", "Id", pollOption.ChatPollId);
-            return View(pollOption);
+            ViewData["AppUserId"] = new SelectList(_context.Users, "Id", "Id", chat.AppUserId);
+            ViewData["EventId"] = new SelectList(_context.Events, "Id", "Id", chat.EventId);
+            return View(chat);
         }
 
-        // GET: Admin/PollOption/Edit/5
+        // GET: Chat/Edit/5
         public async Task<IActionResult> Edit(Guid? id)
         {
-            if (id == null || _context.PollOptions == null)
+            if (id == null || _context.Chats == null)
             {
                 return NotFound();
             }
 
-            var pollOption = await _context.PollOptions.FindAsync(id);
-            if (pollOption == null)
+            var chat = await _context.Chats.FindAsync(id);
+            if (chat == null)
             {
                 return NotFound();
             }
-            ViewData["ChatPollId"] = new SelectList(_context.ChatPolls, "Id", "Id", pollOption.ChatPollId);
-            return View(pollOption);
+            ViewData["AppUserId"] = new SelectList(_context.Users, "Id", "Id", chat.AppUserId);
+            ViewData["EventId"] = new SelectList(_context.Events, "Id", "Id", chat.EventId);
+            return View(chat);
         }
 
-        // POST: Admin/PollOption/Edit/5
+        // POST: Chat/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Guid id, [Bind("Value,ChatPollId,CreatedBy,CreatedAt,ModifiedBy,ModifiedAt,Id")] PollOption pollOption)
+        public async Task<IActionResult> Edit(Guid id, [Bind("Title,ThumbNailImage,EventId,AppUserId,CreatedBy,CreatedAt,ModifiedBy,ModifiedAt,Id")] Chat chat)
         {
-            if (id != pollOption.Id)
+            if (id != chat.Id)
             {
                 return NotFound();
             }
@@ -104,12 +107,12 @@ namespace WebApp.Areas.Admin.Controllers
             {
                 try
                 {
-                    _context.Update(pollOption);
+                    _context.Update(chat);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!PollOptionExists(pollOption.Id))
+                    if (!ChatExists(chat.Id))
                     {
                         return NotFound();
                     }
@@ -120,51 +123,53 @@ namespace WebApp.Areas.Admin.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["ChatPollId"] = new SelectList(_context.ChatPolls, "Id", "Id", pollOption.ChatPollId);
-            return View(pollOption);
+            ViewData["AppUserId"] = new SelectList(_context.Users, "Id", "Id", chat.AppUserId);
+            ViewData["EventId"] = new SelectList(_context.Events, "Id", "Id", chat.EventId);
+            return View(chat);
         }
 
-        // GET: Admin/PollOption/Delete/5
+        // GET: Chat/Delete/5
         public async Task<IActionResult> Delete(Guid? id)
         {
-            if (id == null || _context.PollOptions == null)
+            if (id == null || _context.Chats == null)
             {
                 return NotFound();
             }
 
-            var pollOption = await _context.PollOptions
-                .Include(p => p.ChatPoll)
+            var chat = await _context.Chats
+                .Include(c => c.AppUser)
+                .Include(c => c.Event)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (pollOption == null)
+            if (chat == null)
             {
                 return NotFound();
             }
 
-            return View(pollOption);
+            return View(chat);
         }
 
-        // POST: Admin/PollOption/Delete/5
+        // POST: Chat/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(Guid id)
         {
-            if (_context.PollOptions == null)
+            if (_context.Chats == null)
             {
-                return Problem("Entity set 'AppDbContext.PollOptions'  is null.");
+                return Problem("Entity set 'AppDbContext.Chats'  is null.");
             }
-            var pollOption = await _context.PollOptions.FindAsync(id);
-            if (pollOption != null)
+            var chat = await _context.Chats.FindAsync(id);
+            if (chat != null)
             {
-                _context.PollOptions.Remove(pollOption);
+                _context.Chats.Remove(chat);
             }
             
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool PollOptionExists(Guid id)
+        private bool ChatExists(Guid id)
         {
-          return (_context.PollOptions?.Any(e => e.Id == id)).GetValueOrDefault();
+          return (_context.Chats?.Any(e => e.Id == id)).GetValueOrDefault();
         }
     }
 }
