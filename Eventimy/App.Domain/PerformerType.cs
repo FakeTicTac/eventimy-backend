@@ -1,7 +1,6 @@
 ﻿using Base.Domain;
 using Base.Domain.Translation;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 
 // ReSharper disable CollectionNeverUpdated.Global
@@ -21,8 +20,7 @@ public class PerformerType : DomainEntityMetaId
     /// <summary>
     /// Defines Performer Type Title (Rock Band, Speaker and etc.). 
     /// </summary>
-    [Column(TypeName = "jsonb")]
-    public LanguageString Title { get; set; } = new();
+    public string? Title { get; set; }
     
     /// <summary>
     /// Defines Sign Image For Performer Type on The Server Side Entity Row.

@@ -1,0 +1,153 @@
+﻿<button type="button" class="btn btn-light dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+    Home Related
+</button>
+<ul class="dropdown-menu">
+    <li>
+        <a class="dropdown-item" asp-area="" asp-controller="Home" asp-action="Index">
+            Home
+        </a>
+    </li>
+</ul>
+@if (User.IsInRole("Admin"))
+{
+<button type="button" class="btn btn-light dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+    Poll Related
+</button>
+<ul class="dropdown-menu">
+    <li>
+        <a class="dropdown-item" asp-controller="ChatPoll" asp-action="Index">
+            Chat Poll
+        </a>
+    </li>
+    <li>
+        <a class="dropdown-item" asp-controller="PollOption" asp-action="Index">
+            Poll Option
+        </a>
+    </li>
+    <li>
+        <a class="dropdown-item" asp-controller="PollAnswer" asp-action="Index">
+            Poll Answer
+        </a>
+    </li>
+</ul>
+
+<button type="button" class="btn btn-light dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+    Chat Related
+</button>
+<ul class="dropdown-menu">
+    <li>
+        <a class="dropdown-item" asp-controller="Chat" asp-action="Index">
+            Chat
+        </a>
+    </li>
+    <li>
+        <a class="dropdown-item" asp-controller="ChatParticipant" asp-action="Index">
+            Chat Participant
+        </a>
+    </li>
+    <li>
+        <a class="dropdown-item" asp-controller="ChatMessage" asp-action="Index">
+            Chat Message
+        </a>
+    </li>
+    <li>
+        <a class="dropdown-item" asp-controller="ChatMediaFile" asp-action="Index">
+            Chat Media File
+        </a>
+    </li>
+</ul>
+
+<button type="button" class="btn btn-light dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+    User Related
+</button>
+<ul class="dropdown-menu">
+    <li>
+        <a class="dropdown-item" asp-controller="Subscription" asp-action="Index">
+            Subscription
+        </a>
+    </li>
+    <li>
+        <a class="dropdown-item" asp-controller="RefreshToken" asp-action="Index">
+            Refresh Token
+        </a>
+    </li>
+</ul>
+
+<button type="button" class="btn btn-light dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+    Event Related
+</button>
+<ul class="dropdown-menu">
+    <li>
+        <a class="dropdown-item" asp-controller="Event" asp-action="Index">
+            Event
+        </a>
+    </li>
+    <li>
+        <a class="dropdown-item" asp-controller="EventCategory" asp-action="Index">
+            Event Category
+        </a>
+    </li>
+    <li>
+        <a class="dropdown-item" asp-controller="EventMediaFile" asp-action="Index">
+            Event Media File
+        </a>
+    </li>
+    <li>
+        <a class="dropdown-item" asp-controller="Performer" asp-action="Index">
+            Performer
+        </a>
+    </li>
+</ul>
+
+<button type="button" class="btn btn-light dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+    Social Related
+</button>
+<ul class="dropdown-menu">
+    <li>
+        <a class="dropdown-item" asp-controller="UserInEvent" asp-action="Index">
+            User In Event
+        </a>
+    </li>
+    <li>
+        <a class="dropdown-item" asp-controller="UserEventRating" asp-action="Index">
+            User Event Rating
+        </a>
+    </li>
+    <li>
+        <a class="dropdown-item" asp-controller="EventReaction" asp-action="Index">
+            Event Reaction
+        </a>
+    </li>
+</ul>
+
+<button type="button" class="btn btn-light dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+    Basic Related
+</button>
+<ul class="dropdown-menu">
+    <li>
+        <a class="dropdown-item" asp-controller="MediaFileType" asp-action="Index">
+            Media File Type
+        </a>
+    </li>
+    <li>
+        <a class="dropdown-item" asp-controller="ReactionType" asp-action="Index">
+            Reaction Type
+        </a>
+    </li>
+    <li>
+        <a class="dropdown-item" asp-controller="Country" asp-action="Index">
+            Country
+        </a>
+    </li>
+    <li>
+        <a class="dropdown-item" asp-controller="City" asp-action="Index">
+            City
+        </a>
+    </li>
+    <li>
+        <a class="dropdown-item" asp-controller="PerformerType" asp-action="Index">
+            Performer Type
+        </a>
+    </li>
+</ul>
+}

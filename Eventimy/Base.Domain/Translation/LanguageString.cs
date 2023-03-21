@@ -1,4 +1,6 @@
-﻿namespace Base.Domain.Translation;
+﻿
+
+namespace Base.Domain.Translation;
 
 
 /// <summary>

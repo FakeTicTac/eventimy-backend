@@ -1,7 +1,6 @@
 ﻿using Base.Domain;
 using Base.Domain.Translation;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 
 // ReSharper disable CollectionNeverUpdated.Global
@@ -21,8 +20,7 @@ public class MediaFileType : DomainEntityMetaId
     /// <summary>
     /// Defines Media File Type Name (Video, Image, Sound) Entity Row.
     /// </summary>
-    [Column(TypeName = "jsonb")]
-    public LanguageString Name { get; set; } = new();
+    public string? Name { get; set; }
     
     /// <summary>
     /// Defines Sign Image For Media File Location on The Server Side Entity Row.

@@ -1,7 +1,5 @@
 ﻿using Base.Domain;
-using Base.Domain.Translation;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 
 // ReSharper disable CollectionNeverUpdated.Global
@@ -22,8 +20,7 @@ public class Country : DomainEntityMetaId
     /// <summary>
     /// Defines Country Name (Estonia, Russia and etc.) Entity Row.
     /// </summary>
-    [Column(TypeName = "jsonb")]
-    public LanguageString Name { get; set; } = new();
+    public string? Name { get; set; }
 
     /// <summary>
     /// Defines Country Alpha 3 Code (EST, RUS and etc.) Entity Row.

@@ -1,5 +1,4 @@
 ﻿using Base.Domain;
-using Base.Domain.Translation;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -21,14 +20,12 @@ public class EventCategory : DomainEntityMetaId
     /// <summary>
     /// Defines Event Category Title (Medicine and Beauty, Gaming and etc.) Entity Row.
     /// </summary>
-    [Column(TypeName = "jsonb")]
-    public LanguageString Title { get; set; } = new();
+    public string? Title { get; set; }
 
     /// <summary>
     /// Defines Event Category Description Entity Row.
     /// </summary>
-    [Column(TypeName = "jsonb")]
-    public LanguageString Description { get; set; } = new();
+    public string? Description { get; set; }
 
     /// <summary>
     /// Defines Event Category Sign Image Path on Server Side Entity Row.

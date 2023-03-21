@@ -8,7 +8,6 @@
 
     <ItemGroup>
       <ProjectReference Include="..\Base.Extensions.Exceptions\Base.Extensions.Exceptions.csproj" />
-      <ProjectReference Include="..\Base.Extensions.Exception\Base.Extensions.Exception.csproj" />
     </ItemGroup>
 
     <ItemGroup>
