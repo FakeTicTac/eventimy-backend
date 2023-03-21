@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using Base.WebApp.Helpers.Translation;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Localization;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
@@ -101,6 +102,12 @@ builder.Services.ConfigureApplicationCookie(options =>
     
     // Cookie Renew Configurations.
     options.SlidingExpiration = true;
+});
+
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders =
+        ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
 });
 
 builder.Services.AddControllersWithViews(options =>
@@ -195,6 +202,8 @@ app.UseRequestLocalization(options: app.Services.GetService<IOptions<RequestLoca
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseForwardedHeaders();
 
 app.MapControllerRoute(
     name: "areas",
