@@ -110,14 +110,13 @@ builder.Services.AddControllersWithViews(options =>
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("CorsAllowAll",
-        policyBuilder =>
+    options.AddPolicy("localhostCors",
+        builder =>
         {
-            policyBuilder.AllowAnyOrigin();
-            policyBuilder.AllowAnyHeader();
-            policyBuilder.AllowAnyMethod();
+            builder.WithOrigins("https://eventimy.com");
         });
 });
+
 
 builder.Services.AddApiVersioning(options =>
     {
@@ -173,7 +172,7 @@ else
     app.UseHsts();
 }
 
-app.UseCors("CorsAllowAll");
+app.UseCors("localhostCors");
 
 app.UseSwagger();
 app.UseSwaggerUI(options =>
