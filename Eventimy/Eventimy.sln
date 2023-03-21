@@ -6,8 +6,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionIt
 		..\.gitignore = ..\.gitignore
 		Directory.Build.props = Directory.Build.props
 		UsefulCommands.txt = UsefulCommands.txt
-		docker-compose.yml = docker-compose.yml
-		.dockerignore = .dockerignore
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Base.Domain", "Base.Domain\Base.Domain.csproj", "{DEE20C84-8F4D-4C0E-9689-8BEE42947177}"

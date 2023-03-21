@@ -1,6 +1,7 @@
 ﻿using Base.Domain.Identity;
-using Base.Domain.Translation;
-using System.ComponentModel.DataAnnotations.Schema;
+
+
+// ReSharper disable CollectionNeverUpdated.Global
 
 
 namespace App.Domain.Identity;
@@ -15,6 +16,5 @@ public class AppRole : BaseRole
     /// <summary>
     /// Defines Application Role Display Name. 
     /// </summary>
-    [Column(TypeName = "jsonb")]
-    public LanguageString DisplayName { get; set; } = new();
+    public string? DisplayName { get; set; }
 }

@@ -1,7 +1,6 @@
 ﻿using Base.Domain;
 using App.Domain.Identity;
 using Base.Contracts.Domain;
-using Base.Domain.Translation;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -23,20 +22,17 @@ public class Event : DomainEntityUser<AppUser>, IDomainEntityId
     /// <summary>
     /// Defines Event Title Entity Row.
     /// </summary>
-    [Column(TypeName = "jsonb")]
-    public LanguageString Title { get; set; } = new();
+    public string? Title { get; set; }
 
     /// <summary>
     /// Defines Event Summary (Short Representation of Ongoing) Entity Row.
     /// </summary>
-    [Column(TypeName = "jsonb")]
-    public LanguageString Summary { get; set; } = new();
+    public string? Summary { get; set; }
 
     /// <summary>
     /// Defines Event Description Entity Row.
     /// </summary>
-    [Column(TypeName = "jsonb")]
-    public LanguageString Description { get; set; } = new();
+    public string? Description { get; set; }
 
     /// <summary>
     /// Defines Event Main Website Entity Row.

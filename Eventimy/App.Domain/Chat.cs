@@ -1,9 +1,7 @@
 ﻿using Base.Domain;
 using App.Domain.Identity;
 using Base.Contracts.Domain;
-using Base.Domain.Translation;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 
 // ReSharper disable CollectionNeverUpdated.Global
@@ -23,8 +21,7 @@ public class Chat : DomainEntityUser<AppUser>, IDomainEntityId
     /// <summary>
     /// Defines Chat Title Entity Row.
     /// </summary>
-    [Column(TypeName = "jsonb")]
-    public LanguageString Title { get; set; } = new();
+    public string? Title { get; set; }
 
     /// <summary>
     /// Defines Cover Image For Chat on The Server Side Entity Row.

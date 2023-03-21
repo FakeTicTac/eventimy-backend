@@ -164,8 +164,7 @@ public class AppDbContext : IdentityDbContext<AppUser, AppRole, Guid>
             .OnDelete(DeleteBehavior.Cascade);
 
         // Application Chat Related Cascade Deletes.
-        
-        
+
         builder.Entity<Chat>()
             .HasMany(x => x.ChatMediaFiles)
             .WithOne(x => x.Chat)

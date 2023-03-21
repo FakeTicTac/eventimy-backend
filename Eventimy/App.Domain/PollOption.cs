@@ -1,6 +1,4 @@
 ﻿using Base.Domain;
-using Base.Domain.Translation;
-using System.ComponentModel.DataAnnotations.Schema;
 
 
 // ReSharper disable CollectionNeverUpdated.Global
@@ -20,8 +18,7 @@ public class PollOption : DomainEntityMetaId
     /// <summary>
     /// Defines Poll Option Value To Be Chosen By User Entity Row.
     /// </summary>
-    [Column(TypeName = "jsonb")]
-    public LanguageString Value { get; set; } = new();
+    public string? Value { get; set; }
     
     
     // EF CORE Related Relations Are Going Next -->

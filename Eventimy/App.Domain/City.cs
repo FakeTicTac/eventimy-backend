@@ -1,7 +1,5 @@
 ﻿using Base.Domain;
-using Base.Domain.Translation;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 
 // ReSharper disable CollectionNeverUpdated.Global
@@ -21,8 +19,7 @@ public class City : DomainEntityMetaId
     /// <summary>
     /// Defines City Name (Tallinn, Leeds and etc.) Entity Row.
     /// </summary>
-    [Column(TypeName = "jsonb")]
-    public LanguageString Name { get; set; } = new();
+    public string? Name { get; set; }
 
     /// <summary>
     /// Defines City Alpha 3 Code (TLN, AST and etc.) Entity Row.

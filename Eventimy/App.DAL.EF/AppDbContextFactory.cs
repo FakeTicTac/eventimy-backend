@@ -10,7 +10,6 @@ namespace App.DAL.EF;
 /// </summary>
 public class AppDbContextFactory : IDesignTimeDbContextFactory<AppDbContext>
 {
-    
     /// <summary>
     /// Factory For Creation Derived AppDbContext Instances.
     /// </summary>
@@ -19,9 +18,9 @@ public class AppDbContextFactory : IDesignTimeDbContextFactory<AppDbContext>
     public AppDbContext CreateDbContext(string[] args)
     {
         var optionBuilder = new DbContextOptionsBuilder<AppDbContext>();
-        const string connectionString = "Host=localhost;Port=5432;Username=postgres;Password=postgres;database=eventimy";
+        const string connectionString = "Host=d118370.mysql.zonevs.eu;Username=d118370_romake;Password=ROR14121998ror;database=d118370_eventimy";
         
-        optionBuilder.UseNpgsql(connectionString);
+        optionBuilder.UseMySQL(connectionString);
         
         return new AppDbContext(optionBuilder.Options);
     }

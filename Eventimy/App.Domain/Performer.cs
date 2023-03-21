@@ -1,9 +1,7 @@
 ﻿using Base.Domain;
 using App.Domain.Identity;
 using Base.Contracts.Domain;
-using Base.Domain.Translation;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 
 // ReSharper disable CollectionNeverUpdated.Global
@@ -29,8 +27,7 @@ public class Performer : DomainEntityUser<AppUser>, IDomainEntityId
     /// <summary>
     /// Defines Performer Description Entity Row.
     /// </summary>
-    [Column(TypeName = "jsonb")]
-    public LanguageString Description { get; set; } = new();
+    public string? Description { get; set; }
 
     /// <summary>
     /// Defines Cover Image For Performer on The Server Side Entity Row.
